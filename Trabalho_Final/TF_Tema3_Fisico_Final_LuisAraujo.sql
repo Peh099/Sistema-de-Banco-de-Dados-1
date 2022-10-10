@@ -1,0 +1,431 @@
+-- --------  << TFtema3 >>  ----------
+-- 
+--                     SCRIPT DE CRIACAO (DDL)
+--
+-- Data Criacao ...........: 17/04/2022
+-- Autor(es) ..............: Lucas Andrade, Luis Araújo, Marcos Tavares, Mateus Teixeira, Mateus Lima,  Matheus Gomes, Matheus Pinheiro, 
+-- 							 Natanael Filho, Pedro Carlos, Pedro Campos, Rodrigo Brito, Samuel Bacelar, Victor Ribeiro, Victor Silva.
+-- Banco de Dados .........: MySQL 8.0
+-- Base de Dados (nome) ...: TFtema3
+-- 
+-- Ultimas Alteracoes
+--   23/04/2022 => Alteracao nos nomes da base de dados e projeto
+-- 	 30/04/2022 => Adição entidade localidade
+--              => Mudança entidade STATUSCONTRATO para atributo em CONTRATO
+--              => Adição Nova entidade FUNDIARIA
+--              => Adição nova tabela relacionamento n:m administra
+--              => Adição nova entidade TELEFONE
+--              => Adição nova tabela relacionamento n:m guarda
+--   03/05/2022 => Alteracao no nome da base de dados
+-- 				=> Adicao da tabela ADMINISTRADOR
+-- 				=> Mudanças nos atributos da tabela administra
+-- 				=> Remoção da tabela AVISO
+-- 				=> Retirar DV da composição de chave primária de PROCESSO que agora é um atributo opcional
+-- 				=> Remoção de DV de todas as tuplas que recebem a chave primária de PROCESSO
+-- 				=> Definição do auto_increment para = 1 na tabela ACAOORDEMCONTATO
+-- 
+-- PROJETO => 01 Base de Dados
+--         => 29 Tabelas
+-- 		   => 05 Papeis
+-- 		   => 15 Usuarios
+--         
+-- ---------------------------------------------------------
+
+CREATE DATABASE 
+IF NOT EXISTS TFtema3; 
+
+USE TFtema3;
+
+CREATE TABLE PONTOCONTROLE (
+    idPontoControle INT NOT NULL AUTO_INCREMENT,
+    descricao VARCHAR(100) NOT NULL,
+    observacaoInterna VARCHAR(200),
+    pontoControleAnterior INT NOT NULL,
+    itemChecklistAtendido INT NOT NULL,
+    dataCadastro DATE NOT NULL,
+    
+    CONSTRAINT PONTOCONTROLE_PK PRIMARY KEY (idPontoControle)
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE STATUSPROCESSO (
+    idStatusProcesso INT NOT NULL AUTO_INCREMENT ,
+    statusProcesso VARCHAR(50) NOT NULL,
+    dataCadastro DATE NOT NULL,
+    
+    CONSTRAINT STATUSPROCESSO_PK PRIMARY KEY (idStatusProcesso),
+    CONSTRAINT STATUSPROCESSO_UK UNIQUE(statusProcesso)
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE REGIAOADMINISTRATIVA (
+    idRegiao INT NOT NULL AUTO_INCREMENT,
+    nomeRegiao VARCHAR(50) NOT NULL,
+    
+    CONSTRAINT REGIAOADMINISTRATIVA_PK PRIMARY KEY (idRegiao),
+    CONSTRAINT REGIAOADMINISTRATIVA_UK UNIQUE(nomeRegiao)
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE LOCALIDADE (
+    idLocalidade INT NOT NULL AUTO_INCREMENT,
+    descricaoLocalidade VARCHAR(100) NOT NULL,
+    complemento VARCHAR(100),
+    idRegiao INT NOT NULL,
+    
+    CONSTRAINT LOCALIDADE_PK PRIMARY KEY (idLocalidade),
+    CONSTRAINT LOCALIDADE_UK UNIQUE (descricaoLocalidade),
+    CONSTRAINT LOCALIDADE_REGIAOADMINISTRATIVA_FK FOREIGN KEY (idRegiao) REFERENCES REGIAOADMINISTRATIVA(idRegiao)
+		ON DELETE RESTRICT 
+        ON UPDATE RESTRICT        
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE PLANODIRETOR (
+    idPlano INT NOT NULL AUTO_INCREMENT,
+    nomePlano VARCHAR(50) NOT NULL,
+    
+    CONSTRAINT PLANODIRETOR_PK PRIMARY KEY (idPlano),
+    CONSTRAINT PLANODIRETOR_UK UNIQUE (nomePlano)
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE DADOFUNDIARIO(
+    matricula INT NOT NULL,
+    fazenda VARCHAR(50) NOT NULL,
+    cartorio VARCHAR(150) NOT NULL,
+    nirf INT NOT NULL,
+    ccir INT NOT NULL,
+    
+    CONSTRAINT DADOFUNDIARIO_PK PRIMARY KEY (matricula),
+    CONSTRAINT DADOFUNDIARIO_UK UNIQUE (nirf, ccir)
+)ENGINE = InnoDB;
+
+CREATE TABLE FUNDIARIO (
+    idFundiario INT NOT NULL AUTO_INCREMENT,
+    nomeFundiario VARCHAR(50) NOT NULL,
+    
+    CONSTRAINT FUNDIARIO_PK PRIMARY KEY (idFundiario),
+    CONSTRAINT FUNDIARIO_UK UNIQUE (nomeFundiario)
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE FORMULARIO (
+    idFormulario INT NOT NULL AUTO_INCREMENT,
+    titulo VARCHAR(50) NOT NULL,
+    `data` DATE NOT NULL,
+    
+    CONSTRAINT FORMULARIO_PK PRIMARY KEY (idFormulario)
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE TIPOTRAMITACAO (
+    idTipo INT NOT NULL AUTO_INCREMENT,
+    nomeTipo VARCHAR(50) NOT NULL,
+    
+    CONSTRAINT TIPOTRAMITACAO_PK PRIMARY KEY (idTipo),
+    CONSTRAINT TIPOTRAMITACAO_Uk UNIQUE (nomeTipo)
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE AREA (
+    idArea INT NOT NULL AUTO_INCREMENT,
+    puAreaTotal DECIMAL(10,4) NOT NULL,
+    puAreaAPP DECIMAL(10,4) NOT NULL,
+    puReservaLegal DECIMAL(10,4) NOT NULL,
+    carAreaTotal DECIMAL(10,4) NOT NULL,
+    carReservaLegal DECIMAL(10,4) NOT NULL,
+    carAreaAPP DECIMAL(10,4) NOT NULL,
+    contratoAreaReservaLegal DECIMAL(10,4) NOT NULL,
+    contratoAreaAPP DECIMAL(10,4) NOT NULL,
+    contratoAreaTotal DECIMAL(10,4) NOT NULL,
+    
+	CONSTRAINT AREA_PK PRIMARY KEY (idArea)
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE PESSOA (
+    idPessoa INT NOT NULL AUTO_INCREMENT,
+	observacao VARCHAR(100),
+    
+    CONSTRAINT PESSOA_PK PRIMARY KEY (idPessoa)
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE TELEFONE (
+    idTelefone INT AUTO_INCREMENT,
+    ddi INT NOT NULL,
+    ddd INT NOT NULL,
+    numero INT NOT NULL,
+    ramal INT,
+    
+    CONSTRAINT TELEFONE_PK PRIMARY KEY (idTelefone),
+    CONSTRAINT TELEFONE_UK UNIQUE (ddi, ddd, numero)
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE guarda(
+	idPessoa INT NOT NULL,
+    idTelefone INT NOT NULL,
+    
+    CONSTRAINT guarda_PESSOA_FK FOREIGN KEY (idPessoa) REFERENCES PESSOA(idPessoa)
+		ON DELETE RESTRICT 
+        ON UPDATE RESTRICT,
+	CONSTRAINT guarda_TELEFONE_FK FOREIGN KEY (idTelefone) REFERENCES TELEFONE(idTelefone)
+		ON DELETE RESTRICT 
+        ON UPDATE RESTRICT,
+	CONSTRAINT guarda_UK UNIQUE (idPessoa,idTelefone)
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE JURIDICA (
+    cnpj BIGINT NOT NULL,
+    numeroInscricao INT NOT NULL,
+    estadoInscricao VARCHAR(2) NOT NULL,
+    razaoSocial VARCHAR(50) NOT NULL,
+    idPessoa INT NOT NULL,
+    
+    CONSTRAINT JURIDICA_PK PRIMARY KEY (cnpj),
+	CONSTRAINT JURIDICA_PESSOA_FK FOREIGN KEY (idPessoa) REFERENCES PESSOA(idPessoa) 
+		ON DELETE RESTRICT 
+        ON UPDATE RESTRICT,
+    CONSTRAINT JURIDICA_UK UNIQUE (numeroInscricao, estadoInscricao)
+)ENGINE = InnoDB;
+
+CREATE TABLE FISICA (
+    cpf BIGINT NOT NULL,
+    nome VARCHAR(50) NOT NULL,
+    numeroRg INT NOT NULL,
+    ufRg VARCHAR(2) NOT NULL,
+    emissorRg VARCHAR(100) NOT NULL,
+    dataEmissaoRg DATE NOT NULL,
+    cidadeNascimento VARCHAR(50) NOT NULL,
+    estadoNascimento VARCHAR(2) NOT NULL,
+    dataNascimento DATE NOT NULL,
+    conjugeCPF BIGINT,
+    conjugeNome VARCHAR(50),
+    estadoCivil VARCHAR(10) NOT NULL,
+    idPessoa INT NOT NULL,
+    
+    CONSTRAINT FISICA_PK PRIMARY KEY (cpf),
+    CONSTRAINT FISICA_PESSOA_FK FOREIGN KEY (idPessoa) REFERENCES PESSOA(idPessoa) 
+		ON DELETE RESTRICT 
+        ON UPDATE RESTRICT,
+	CONSTRAINT FISICA_UK UNIQUE (numeroRg, ufRg, emissorRg, dataEmissaoRg)
+)ENGINE = InnoDB;
+
+CREATE TABLE ADMINISTRADOR (
+    CPFAdministrador BIGINT NOT NULL, 
+    nomeAdministrador VARCHAR(100) NOT NULL,
+    
+    CONSTRAINT ADMINISTRADOR_PK PRIMARY KEY (CPFAdministrador)
+)ENGINE = InnoDB;
+
+CREATE TABLE administra (
+    CPFAdministrador BIGINT NOT NULL,
+    cnpj BIGINT NOT NULL,
+    
+    CONSTRAINT administra_UK UNIQUE (CPFAdministrador, cnpj),
+    CONSTRAINT administra_ADMINISTRADOR_FK FOREIGN KEY (CPFAdministrador) REFERENCES ADMINISTRADOR (CPFAdministrador)
+		ON DELETE RESTRICT
+        ON UPDATE RESTRICT,
+	CONSTRAINT administra_JURIDICA_FK FOREIGN KEY (cnpj) REFERENCES JURIDICA (cnpj)
+		ON DELETE RESTRICT
+        ON UPDATE RESTRICT
+)ENGINE = InnoDB;
+
+CREATE TABLE ENDERECO (
+    idEndereco INT NOT NULL AUTO_INCREMENT,
+    uf VARCHAR(2) NOT NULL,
+    bairro VARCHAR(50) NOT NULL,
+    cidade VARCHAR(50) NOT NULL,
+    cep INT NOT NULL,
+    caixaPostal INT NOT NULL,
+    endereco VARCHAR(100) NOT NULL,
+    observacao VARCHAR(200),
+    correspondencia BOOLEAN NOT NULL,
+    
+	CONSTRAINT ENDERECO_PK PRIMARY KEY (idEndereco),
+    CONSTRAINT ENDERECO_UK UNIQUE (uf, bairro, cidade, cep, caixaPostal, endereco)
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE conta (
+    idPessoa INT NOT NULL,
+    idEndereco INT NOT NULL,
+    
+    CONSTRAINT conta_UK UNIQUE(idPessoa, idEndereco),
+    CONSTRAINT conta_PESSOA_FK FOREIGN KEY (idPessoa) REFERENCES PESSOA (idPessoa) 
+		ON DELETE RESTRICT 
+        ON UPDATE CASCADE,
+    CONSTRAINT conta_ENDERECO_FK FOREIGN KEY (idEndereco) REFERENCES ENDERECO (idEndereco) 
+		ON DELETE RESTRICT 
+        ON UPDATE CASCADE
+)ENGINE = InnoDB;
+
+CREATE TABLE PROCESSO (
+    orgao INT NOT NULL,
+    numeroProcesso INT NOT NULL,
+    ano INT NOT NULL,
+    DV INT,
+    dataAutuacao DATE NOT NULL,
+    idArea INT NOT NULL,
+    idTipo INT NOT NULL,
+    idPlano INT NOT NULL,
+    idFundiario INT NOT NULL,
+    idPessoa INT NOT NULL,
+    idStatusProcesso INT NOT NULL,
+    idPontoControle INT NOT NULL,
+    idLocalidade INT NOT NULL,
+    idFormulario INT,
+    matricula INT NOT NULL,
+    observacao VARCHAR(200),
+    
+    CONSTRAINT PROCESSO_PK PRIMARY KEY (orgao, numeroProcesso, ano),
+    CONSTRAINT PROCESSO_AREA_FK FOREIGN KEY (idArea) REFERENCES AREA (idArea)
+		ON DELETE RESTRICT 
+        ON UPDATE CASCADE,
+    CONSTRAINT PROCESSO_TIPOTRAMITACAO_FK FOREIGN KEY (idTipo) REFERENCES TIPOTRAMITACAO (idTipo) 
+		ON DELETE RESTRICT 
+		ON UPDATE CASCADE,
+	CONSTRAINT PROCESSO_PLANODIRETOR_FK FOREIGN KEY (idPlano) REFERENCES PLANODIRETOR (idPlano) 
+		ON DELETE RESTRICT 
+		ON UPDATE CASCADE,
+    CONSTRAINT PROCESSO_FUNDIARIO_FK FOREIGN KEY (idFundiario) REFERENCES FUNDIARIO(idFundiario) 
+		ON DELETE RESTRICT 
+		ON UPDATE CASCADE,
+    CONSTRAINT PROCESSO_PESSOA_FK FOREIGN KEY (idPessoa) REFERENCES PESSOA(idPessoa) 
+		ON DELETE RESTRICT 
+        ON UPDATE CASCADE,
+    CONSTRAINT PROCESSO_STATUSPROCESSO_FK FOREIGN KEY (idStatusProcesso) REFERENCES STATUSPROCESSO(idStatusProcesso) 
+		ON DELETE RESTRICT 
+        ON UPDATE CASCADE,
+    CONSTRAINT PROCESSO_PONTOCONTROLE_FK FOREIGN KEY (idPontoControle) REFERENCES PONTOCONTROLE(idPontoControle)
+		ON DELETE RESTRICT 
+        ON UPDATE CASCADE,
+	CONSTRAINT PROCESSO_LOCALIDADE_FK FOREIGN KEY (idLocalidade) REFERENCES LOCALIDADE(idLocalidade) 
+		ON DELETE RESTRICT 
+        ON UPDATE CASCADE,
+	CONSTRAINT PROCESSO_FORMULARIO_FK FOREIGN KEY (idFormulario) REFERENCES FORMULARIO(idFormulario) 
+		ON DELETE RESTRICT 
+        ON UPDATE CASCADE,
+	CONSTRAINT PROCESSO_DADOFUNDIARIO_FK FOREIGN KEY (matricula) REFERENCES DADOFUNDIARIO(matricula)
+		ON DELETE RESTRICT 
+		ON UPDATE CASCADE
+)ENGINE = InnoDB;
+
+CREATE TABLE TERMOCONTRATO (
+    idTermoContrato INT NOT NULL AUTO_INCREMENT,
+    nomeTermo VARCHAR(50) NOT NULL,
+    
+    CONSTRAINT TERMOCONTRATO_PK PRIMARY KEY (idTermoContrato),
+    CONSTRAINT TERMOCONTRATO_UK UNIQUE (nomeTermo)
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE CONTRATO (
+    idContrato INT NOT NULL AUTO_INCREMENT,
+    numero INT NOT NULL,
+    dataAssinatura DATE NOT NULL,
+    emissor VARCHAR(50) NOT NULL,
+    cartorio INT NOT NULL,
+    protocolo INT NOT NULL,
+    livro INT NOT NULL,
+    folha INT NOT NULL,
+    numeroDODF INT NOT NULL,
+    dataDODF DATE NOT NULL,
+    orgao INT NOT NULL,
+    numeroProcesso INT NOT NULL,
+    ano INT NOT NULL,
+    idTermoContrato INT NOT NULL,
+    
+    CONSTRAINT CONTRATO_PK PRIMARY KEY (idContrato),
+    CONSTRAINT CONTRATO_PROCESSO_FK FOREIGN KEY (orgao, numeroProcesso, ano) REFERENCES PROCESSO (orgao, numeroProcesso, ano) 
+		ON DELETE RESTRICT 
+        ON UPDATE CASCADE,
+    CONSTRAINT CONTRATO_TERMOCONTRATO_FK FOREIGN KEY (idTermoContrato) REFERENCES TERMOCONTRATO (idTermoContrato) 
+		ON DELETE RESTRICT 
+        ON UPDATE CASCADE
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE STATUSCLO (
+    idStatusCLO INT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(50) NOT NULL,
+    
+    CONSTRAINT STATUSCLO_PK PRIMARY KEY (idStatusCLO),
+    CONSTRAINT STATUSCLO_UK UNIQUE (nome)
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE CLO (
+    numeroCLO INT NOT NULL,
+    dataEmissao DATE NOT NULL,
+    legitimoOcupante VARCHAR(50) NOT NULL,
+    orgao INT NOT NULL,
+    numeroProcesso INT NOT NULL,
+    ano INT NOT NULL,
+    idStatusCLO INT NOT NULL,
+    
+    CONSTRAINT CLO_PK PRIMARY KEY (numeroCLO),
+    CONSTRAINT CLO_PROCESSO_FK FOREIGN KEY (orgao, numeroProcesso, ano) REFERENCES PROCESSO (orgao, numeroProcesso, ano) 
+		ON DELETE RESTRICT 
+        ON UPDATE CASCADE,
+    CONSTRAINT CLO_STATUSCLO_FK FOREIGN KEY (idStatusCLO) REFERENCES STATUSCLO (idStatusCLO) 
+		ON DELETE RESTRICT 
+        ON UPDATE CASCADE
+)ENGINE = InnoDB;
+
+CREATE TABLE ACAOORDEMCONTATO (
+    idAcao INT NOT NULL AUTO_INCREMENT,
+    nomeAcao VARCHAR(50) NOT NULL,
+    
+    CONSTRAINT ACAOORDEMCONTATO_PK PRIMARY KEY (idAcao),
+    CONSTRAINT ACAOORDEMCONTATO_UK UNIQUE (nomeAcao)
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE ORDEMCONTATO (
+    idOrdemContato INT NOT NULL AUTO_INCREMENT,
+    dataAbertura DATE NOT NULL,
+    prazo INT NOT NULL,
+    orgao INT NOT NULL,
+    numeroProcesso INT NOT NULL,
+    ano INT NOT NULL,
+    idAcao INT NOT NULL,
+    observacao VARCHAR(50),
+    
+    CONSTRAINT ORDEMCONTATO_PK PRIMARY KEY (idOrdemContato),
+    CONSTRAINT ORDEMCONTATO_PROCESSO_FK FOREIGN KEY (orgao, numeroProcesso, ano) REFERENCES PROCESSO (orgao, numeroProcesso, ano) 
+		ON DELETE RESTRICT 
+        ON UPDATE CASCADE,
+	CONSTRAINT ORDEMCONTATO_ACAOORDEMCONTATO_FK FOREIGN KEY (idAcao) REFERENCES ACAOORDEMCONTATO (idAcao) 
+		ON DELETE RESTRICT 
+        ON UPDATE CASCADE
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE DOCUMENTO (
+    idDocumento INT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(50) NOT NULL,
+    
+    CONSTRAINT DOCUMENTO_PK PRIMARY KEY (idDocumento),
+    CONSTRAINT DOCUMENTO_UK UNIQUE (nome)
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE ITEMCHECKLIST (
+    idItemChecklist INT NOT NULL AUTO_INCREMENT,
+    statusChecklist BOOLEAN DEFAULT FALSE,
+    numeroFolha INT,
+    numeroDocumento INT NOT NULL,
+    aplicavel BOOLEAN DEFAULT FALSE,
+    autenticacao BOOLEAN DEFAULT FALSE,
+    detalhe VARCHAR(50),
+    validade DATE NOT NULL,
+    orgao INT NOT NULL,
+    numeroProcesso INT NOT NULL,
+    ano INT NOT NULL,
+    idDocumento INT NOT NULL,
+    
+	CONSTRAINT ITEMCHECKLIST_PK PRIMARY KEY (idItemChecklist),
+    CONSTRAINT ITEMCHECKLIST_PROCESSO_FK FOREIGN KEY (orgao, numeroProcesso, ano) REFERENCES PROCESSO (orgao, numeroProcesso, ano) 
+		ON DELETE RESTRICT 
+        ON UPDATE RESTRICT,
+	CONSTRAINT ITEMCHECKLIST_DOCUMENTO_FK FOREIGN KEY (idDocumento) REFERENCES DOCUMENTO (idDocumento) 
+		ON DELETE RESTRICT 
+        ON UPDATE RESTRICT
+)ENGINE = InnoDB AUTO_INCREMENT = 1;
+
+CREATE TABLE email (
+    idPessoa INT NOT NULL,
+    email VARCHAR(50) NOT NULL,
+    
+    CONSTRAINT email_UK UNIQUE (email, idPessoa),
+	CONSTRAINT email_PESSOA_FK FOREIGN KEY (idPessoa) REFERENCES PESSOA(idPessoa) 
+		ON DELETE CASCADE 
+        ON UPDATE CASCADE
+)ENGINE = InnoDB;
+
+

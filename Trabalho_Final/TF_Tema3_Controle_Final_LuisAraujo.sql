@@ -1,0 +1,104 @@
+-- --------  << TFtema3 >>  ----------
+-- 
+--                     SCRIPT CONTROLE (DDL)
+--
+-- Data Criacao ...........: 23/04/2022
+-- Autor(es) ..............: Lucas Andrade, Luis Araújo, Marcos Tavares, Mateus Teixeira, Mateus Lima,  Matheus Gomes, Matheus Pinheiro, 
+-- 							 Natanael Filho, Pedro Carlos, Pedro Campos, Rodrigo Brito, Samuel Bacelar, Victor Ribeiro, Victor Silva.
+-- Banco de Dados .........: MySQL 8.0
+-- Base de Dados (nome) ...: TFtema3
+-- 
+-- Ultimas Alteracoes
+--   30/04/2022 => Criaçao dos PAPEIS
+-- 				=> Criacao de 3 USUARIOS para cada PAPEL
+--  			=> Definicao dos PAPEIS de cada USUARIO
+-- 				=> Alteração no nome da base de dados
+--   03/05/2022 => Adição de privilégios para as tabelas administra e ADMINISTRADOR para as ROLES MENU e GERENCIAL
+--
+-- PROJETO => 01 Base de Dados
+--         => 29 Tabelas
+-- 		   => 05 Papeis
+-- 		   => 15 Usuarios
+-- 	
+-- ---------------------------------------------------------
+USE TFtema3;
+
+-- CRIA PAPEIS
+	CREATE ROLE USUARIO;
+	CREATE ROLE MENU;
+	CREATE ROLE GERENCIAL;
+	CREATE ROLE ADMINISTRADOR;
+	CREATE ROLE DESENVOLVEDOR;
+
+-- DEFINE OS PRIVILÉGIOS DOS PAPEIS
+-- USUARIO
+	GRANT select on *.* TO USUARIO;
+-- MENU   
+	GRANT insert on PROCESSO TO MENU;
+	GRANT update on PROCESSO TO MENU;
+	GRANT select on PROCESSO TO MENU;
+	GRANT ALL PRIVILEGES on PESSOA TO MENU;
+	GRANT ALL PRIVILEGES on FISICA TO MENU;
+	GRANT ALL PRIVILEGES on JURIDICA TO MENU;
+	GRANT ALL PRIVILEGES on ADMINISTRADOR TO MENU;
+    GRANT ALL PRIVILEGES on administra TO MENU;
+	GRANT ALL PRIVILEGES on FORMULARIOS TO MENU;
+	GRANT ALL PRIVILEGES on ORDEMCONTATO TO MENU;
+	GRANT ALL PRIVILEGES on ITEMCHECKLIST TO MENU;
+-- GERENCIAL
+	GRANT ALL PRIVILEGES on PROCESSO TO GERENCIAL;
+    GRANT ALL PRIVILEGES on PESSOA TO GERENCIAL;
+    GRANT ALL PRIVILEGES on ramal TO GERENCIAL;
+    GRANT ALL PRIVILEGES on email TO GERENCIAL;
+    GRANT ALL PRIVILEGES on ENDERECO TO GERENCIAL;
+    GRANT ALL PRIVILEGES on conta TO GERENCIAL;
+    GRANT ALL PRIVILEGES on FISICA TO GERENCIAL;
+    GRANT ALL PRIVILEGES on JURIDICA TO GERENCIAL;
+	GRANT ALL PRIVILEGES on ADMINISTRADOR TO MENU;
+    GRANT ALL PRIVILEGES on administra TO MENU;
+    GRANT ALL PRIVILEGES on AVISO TO GERENCIAL;
+	GRANT ALL PRIVILEGES on CLO TO GERENCIAL;
+    GRANT ALL PRIVILEGES on CONTRATO TO GERENCIAL;
+    GRANT ALL PRIVILEGES on ITEMCHECKLIST TO GERENCIAL;
+    GRANT ALL PRIVILEGES on TIPOITEMCHECKLIST TO GERENCIAL;
+	GRANT ALL PRIVILEGES on PONTOCONTROLE TO GERENCIAL;
+-- ADMINISTRADOR 
+	GRANT INSERT, SELECT, DELETE, UPDATE, GRANT OPTION ON *.* TO ADMINISTRADOR;
+-- DESENVOLVEDOR
+	GRANT ALL PRIVILEGES ON *.* TO DESENVOLVEDOR;
+    
+-- CRIA OS USUARIOS E DEFINE SEUS PAPEIS
+CREATE USER joaoVictor IDENTIFIED BY '!jaoVicctur123';
+GRANT USUARIO to joaoVictor;
+CREATE USER mariaJoana IDENTIFIED BY '@MariJo4';
+GRANT USUARIO to mariaJoana;
+CREATE USER pedroAugusto IDENTIFIED BY '#Peddaug12';
+GRANT USUARIO to pedroAugusto;
+
+CREATE USER marianaPaz IDENTIFIED BY '&pazMa43';
+GRANT MENU to marianaPaz;
+CREATE USER ezequiasSilva IDENTIFIED BY '%$zezez10';
+GRANT MENU to ezequiasSilva;
+CREATE USER robertaSouza IDENTIFIED BY '@!robss332';
+GRANT MENU to robertaSouza;
+
+CREATE USER LucasMelo IDENTIFIED BY '*$LuMeU21';
+GRANT GERENCIAL to LucasMelo;
+CREATE USER ameliaCruz IDENTIFIED BY '@!cruzAs65';
+GRANT GERENCIAL to ameliaCruz;
+CREATE USER pauloBezerra IDENTIFIED BY '&%paBez52';
+GRANT GERENCIAL to pauloBezerra;
+
+CREATE USER DaianaMoraes IDENTIFIED BY '$$DaMor5';
+GRANT ADMINISTRADOR to DaianaMoraes;
+CREATE USER LeticiaSantos IDENTIFIED BY '!@letSantos32';
+GRANT ADMINISTRADOR to LeticiaSantos;
+CREATE USER lorenaAlves IDENTIFIED BY '&&loalew21';
+GRANT ADMINISTRADOR to lorenaAlves;
+
+CREATE USER daviLima IDENTIFIED BY '@!daviLI43';
+GRANT DESENVOLVEDOR to daviLima;
+CREATE USER jonasBrother IDENTIFIED BY '&&jonasB12';
+GRANT DESENVOLVEDOR to jonasBrother;
+CREATE USER julianaPaes IDENTIFIED BY '##JUpaes12';
+GRANT DESENVOLVEDOR to julianaPaes;
